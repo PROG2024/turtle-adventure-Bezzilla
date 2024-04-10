@@ -333,7 +333,7 @@ class FencingEnemy(Enemy):
         self.__directions = [(1, 0), (0, 1), (-1, 0),
                              (0, -1)]  # Right, Down, Left, Up
         self.__current_direction_index = 0
-        self.speed = 3
+        self.speed = 5
 
     def create(self) -> None:
         self.__id = self.canvas.create_oval(0, 0, self.size,
@@ -438,26 +438,25 @@ class EnemyGenerator:
         """
         Create a new enemy, possibly based on the game level
         """
-        for i in range(10):
+        for i in range(self.level+3):
             random_walk_enemy = RandomWalkEnemy(self.__game, 20, "red")
             random_walk_enemy.x = random.randint(100, 500)
             random_walk_enemy.y = random.randint(100, 500)
             self.game.add_element(random_walk_enemy)
-        for i in range(3):
+        for i in range(self.level):
             chase_enemy = ChasingEnemy(self.__game, 20, "blue")
             chase_enemy.x = random.randint(100, 500)
             chase_enemy.y = random.randint(100, 500)
             self.game.add_element(chase_enemy)
-            fencing_enemy = FencingEnemy(self.__game, 20, "black")
-            fencing_enemy.x = 710
-            fencing_enemy.y = 250
-            self.game.add_element(fencing_enemy)
-        for i in range(10):
+        for i in range(self.level*5):
             bounce_enemy = BounceEnemy(self.__game, 20, "green")
             bounce_enemy.x = random.randint(100, 500)
             bounce_enemy.y = random.randint(100, 500)
             self.game.add_element(bounce_enemy)
-
+        fencing_enemy = FencingEnemy(self.__game, 20, "black")
+        fencing_enemy.x = 710
+        fencing_enemy.y = 250
+        self.game.add_element(fencing_enemy)
 
 class TurtleAdventureGame(Game):  # pylint: disable=too-many-ancestors
     """
