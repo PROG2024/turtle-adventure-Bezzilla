@@ -267,7 +267,8 @@ class RandomWalkEnemy(Enemy):
         self.speed = 2
 
     def create(self) -> None:
-        self.__id = self.canvas.create_oval(0, 0, self.size, self.size, fill=self.color)
+        self.__id = self.canvas.create_oval(0, 0, self.size, self.size,
+                                            fill=self.color)
 
     def update(self) -> None:
         self.x += random.uniform(-5, 5) * self.speed
@@ -277,8 +278,10 @@ class RandomWalkEnemy(Enemy):
             self.game.game_over_lose()
 
     def render(self) -> None:
-        self.canvas.coords(self.__id, self.x - self.size / 2, self.y - self.size / 2,
-                                self.x + self.size / 2, self.y + self.size / 2)
+        self.canvas.coords(self.__id, self.x - self.size / 2,
+                           self.y - self.size / 2,
+                           self.x + self.size / 2, self.y + self.size / 2)
+
     def delete(self) -> None:
         self.canvas.delete(self.__id)
 
@@ -294,7 +297,8 @@ class ChasingEnemy(Enemy):
         self.player = self.game.player
 
     def create(self) -> None:
-        self.__id = self.canvas.create_oval(0, 0, self.size, self.size, fill=self.color)
+        self.__id = self.canvas.create_oval(0, 0, self.size, self.size,
+                                            fill=self.color)
 
     def update(self) -> None:
         angle = math.atan2(self.player.y - self.y, self.player.x - self.x)
@@ -307,7 +311,8 @@ class ChasingEnemy(Enemy):
             self.game.game_over_lose()
 
     def render(self) -> None:
-        self.canvas.coords(self.__id, self.x - self.size / 2, self.y - self.size / 2,
+        self.canvas.coords(self.__id, self.x - self.size / 2,
+                           self.y - self.size / 2,
                            self.x + self.size / 2, self.y + self.size / 2)
 
     def delete(self) -> None:
@@ -325,14 +330,31 @@ class FencingEnemy(Enemy):
                  color: str):
         super().__init__(game, size, color)
         self.__id: int
-        self.speed = 2
+        self.__directions = [(1, 0), (0, 1), (-1, 0),
+                             (0, -1)]  # Right, Down, Left, Up
+        self.__current_direction_index = 0
+        self.speed = 3
 
     def create(self) -> None:
         self.__id = self.canvas.create_oval(0, 0, self.size,
                                             self.size, fill=self.color)
 
     def update(self) -> None:
-        pass
+        dx, dy = self.__directions[self.__current_direction_index]
+        self.x += dx * self.speed
+        self.y += dy * self.speed
+
+        if self.x >= self.game.home.x + self.game.home.size / 2 and self.__current_direction_index == 0:
+            self.__current_direction_index = 1
+        elif self.y >= self.game.home.y + self.game.home.size / 2 and self.__current_direction_index == 1:
+            self.__current_direction_index = 2
+        elif self.x <= self.game.home.x - self.game.home.size / 2 and self.__current_direction_index == 2:
+            self.__current_direction_index = 3
+        elif self.y <= self.game.home.y - self.game.home.size / 2 and self.__current_direction_index == 3:
+            self.__current_direction_index = 0
+
+        if self.hits_player():
+            self.game.game_over_lose()
 
     def render(self) -> None:
         self.canvas.coords(self.__id, self.x - self.size / 2,
@@ -367,6 +389,9 @@ class BounceEnemy(Enemy):
         self.x += dx * self.speed
         self.y += dy * self.speed
         self.direction = (dx, dy)
+
+        if self.hits_player():
+            self.game.game_over_lose()
 
     def render(self) -> None:
         self.canvas.coords(self.__id, self.x - self.size / 2,
@@ -424,7 +449,7 @@ class EnemyGenerator:
             chase_enemy.y = random.randint(100, 500)
             self.game.add_element(chase_enemy)
             fencing_enemy = FencingEnemy(self.__game, 20, "black")
-            fencing_enemy.x = 650
+            fencing_enemy.x = 710
             fencing_enemy.y = 250
             self.game.add_element(fencing_enemy)
         for i in range(10):
